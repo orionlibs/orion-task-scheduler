@@ -1,9 +1,10 @@
-package io.github.orionlibs.project_name.config;
+package io.github.orionlibs.orion_task_scheduler.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -15,21 +16,21 @@ public class OrionConfiguration extends Properties
     /**
      * The location of the configuration file that has configuration for the features of this plugin.
      */
-    public static final String FEATURE_CONFIGURATION_FILE = "/io/github/orionlibs/orion_iot/configuration/orion-feature-configuration.prop";
+    public static final String FEATURE_CONFIGURATION_FILE = "/io/github/orionlibs/orion_task_scheduler/configuration/orion-feature-configuration.prop";
 
 
-    public static OrionConfiguration loadFeatureConfiguration(Properties customConfig) throws IOException
+    public static OrionConfiguration loadFeatureConfiguration() throws IOException
     {
         OrionConfiguration featureConfiguration = new OrionConfiguration();
         InputStream defaultConfigStream = OrionConfiguration.class.getResourceAsStream(FEATURE_CONFIGURATION_FILE);
         try
         {
-            featureConfiguration.loadDefaultAndCustomConfiguration(defaultConfigStream, customConfig);
+            featureConfiguration.loadDefaultAndCustomConfiguration(defaultConfigStream, null);
             return featureConfiguration;
         }
         catch(IOException e)
         {
-            throw new IOException("Could not setup feature configuration for Orion IoT: ", e);
+            throw new IOException("Could not setup feature configuration for orion_task_scheduler: ", e);
         }
     }
 
@@ -44,22 +45,27 @@ public class OrionConfiguration extends Properties
      */
     public void loadDefaultAndCustomConfiguration(InputStream defaultConfiguration, Properties customConfig) throws IOException
     {
-        Properties allProperties = new Properties();
-        for(Map.Entry<Object, Object> prop : System.getProperties().entrySet())
+        Properties tempProperties = new Properties();
+        tempProperties.load(defaultConfiguration);
+        Map<String, String> allProperties = new HashMap<>();
+        boolean doesCustomConfigExist = customConfig != null;
+        for(Map.Entry<Object, Object> prop : tempProperties.entrySet())
         {
             String key = (String)prop.getKey();
-            String value = (String)prop.getValue();
-            allProperties.put(key, value);
-        }
-        allProperties.load(defaultConfiguration);
-        if(customConfig != null)
-        {
-            for(Map.Entry<Object, Object> prop : customConfig.entrySet())
+            String value = null;
+            if(doesCustomConfigExist)
             {
-                String key = (String)prop.getKey();
-                String value = (String)prop.getValue();
-                allProperties.put(key, value);
+                value = customConfig.getProperty(key);
+                if(value == null)
+                {
+                    value = (String)prop.getValue();
+                }
             }
+            else
+            {
+                value = (String)prop.getValue();
+            }
+            allProperties.put(key, value);
         }
         putAll(allProperties);
     }
@@ -86,18 +92,5 @@ public class OrionConfiguration extends Properties
     public void updateProp(String key, String value)
     {
         put(key, value);
-    }
-
-
-    /**
-     * remaps the given keys to the given values
-     * @param customConfig
-     */
-    public void updateProps(Properties customConfig)
-    {
-        if(customConfig != null)
-        {
-            putAll(customConfig);
-        }
     }
 }

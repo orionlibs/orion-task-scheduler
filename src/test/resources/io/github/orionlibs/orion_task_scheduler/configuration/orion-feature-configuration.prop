@@ -1,0 +1,2 @@
+orionlibs.orion_task_scheduler.enabled=true
+orionlibs.orion_task_scheduler.cancellation.enabled=true
