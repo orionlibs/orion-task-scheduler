@@ -1,7 +1,7 @@
 package io.github.orionlibs.orion_task_scheduler;
 
-import io.github.orionlibs.task_scheduler.config.ConfigurationService;
-import io.github.orionlibs.task_scheduler.config.OrionConfiguration;
+import io.github.orionlibs.orion_task_scheduler.config.ConfigurationService;
+import io.github.orionlibs.orion_task_scheduler.config.OrionConfiguration;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
